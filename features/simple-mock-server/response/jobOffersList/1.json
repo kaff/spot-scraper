@@ -1,0 +1,36 @@
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "url": "http:\/\/localhost:8000?job=design-ux",
+        "title": "Design UX",
+        "categories": [
+          {
+            "url": "https:\/\/www.spotifyjobs.com\/search-jobs\/#category=design-ux",
+            "slug": "design-ux",
+            "name": "Design &amp; UX"
+          },
+          {
+            "url": "https:\/\/www.spotifyjobs.com\/search-jobs\/#category=product-design",
+            "slug": "product-design",
+            "name": "Product Design"
+          }
+        ],
+        "locations": [
+          {
+            "url": "https:\/\/www.spotifyjobs.com\/search-jobs\/#location=stockholm",
+            "slug": "stockholm",
+            "name": "Stockholm"
+          },
+          {
+            "url": "https:\/\/www.spotifyjobs.com\/search-jobs\/#location=sweden",
+            "slug": "sweden",
+            "name": "Sweden"
+          }
+        ]
+      }
+    ],
+    "show_pager": true
+  }
+}

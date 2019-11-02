@@ -48,13 +48,13 @@ class SpotifyCommand extends Command
                     return $category->slug;
                 }, $offerItem->categories);
 
-//            $scrappedJobOffer = $this->getJobOffer($item->url);
+            $scrappedJobOffer = $this->getJobOffer($offerItem->url);
 
                 $analysedItems[] = array_merge([
                     'url' => $offerItem->url,
                     'categories' => $categories,
                     'forExperiencedProfessionals' => $this->offerForExperiencedProfessionals($offerItem->categories),
-//                'requiredYearsOfExperience' => $this->getYearsOfExperience($scrappedJobOffer['description'], $categories)
+                'requiredYearsOfExperience' => $this->getYearsOfExperience($scrappedJobOffer['description'], $categories)
                 ], $scrappedJobOffer ?? []);
 
                 return $analysedItems;
@@ -62,9 +62,6 @@ class SpotifyCommand extends Command
             }, $analysedItems);
 
         }
-
-
-        file_put_contents('test.txt', print_r($analysedItems, true), FILE_APPEND);
 
         $io->success('OK');
         return 0;
@@ -107,7 +104,7 @@ class SpotifyCommand extends Command
         $desc = trim($crawler->filter('div.entry-content')->text());
 
         return [
-//            'description' => $desc
+            'description' => $desc
         ];
     }
 
