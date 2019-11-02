@@ -4,9 +4,7 @@ default:
             contexts:
                 - CommandContext:
                     kernel: '@kernel'
-                - MockServerContext:
-                    kernel: '@kernel'
-
+                    basePath: '%paths.base%'
     extensions:
         Behat\Symfony2Extension:
             kernel:

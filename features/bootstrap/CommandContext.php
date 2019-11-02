@@ -6,6 +6,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use PHPUnit\Framework\Assert;
 
 class CommandContext implements Context
 {
@@ -24,11 +25,24 @@ class CommandContext implements Context
      */
     private $output;
 
-    public function __construct(KernelInterface $kernel)
+    /**
+     * @var string
+     */
+    private $basePath;
+
+    public function __construct(KernelInterface $kernel, string $basePath)
     {
         $this->kernel = $kernel;
         $this->application = new Application($kernel);
         $this->output = new BufferedOutput();
+        $this->basePath = $basePath;
+    }
+
+    /**
+     * @Given there are job offers on spotify website
+     */
+    public function thereAreJobOffersOnSpotifyWebsite()
+    {
     }
 
     /**
@@ -45,6 +59,19 @@ class CommandContext implements Context
      */
     public function iHaveCvsReportInWithData($reportPath, TableNode $table)
     {
-//        throw new PendingException();
+        $tableRows = $table->getRows();
+        unset($tableRows[0]); //remove header
+        $expectedRows = array_values($tableRows);
+
+        $i = 0;
+        $handle = fopen($this->basePath . DIRECTORY_SEPARATOR . $reportPath, "r");
+        while (($generatedReportRow = fgetcsv($handle)) !== FALSE) {
+            Assert::assertEquals(
+                $expectedRows[$i],
+                $generatedReportRow
+            );
+
+            $i++;
+        }
     }
 }

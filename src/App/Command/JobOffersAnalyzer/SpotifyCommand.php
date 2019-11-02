@@ -52,9 +52,10 @@ class SpotifyCommand extends Command
 
                 $analysedItems[] = array_merge([
                     'url' => $offerItem->url,
+                    'headline' => $offerItem->title,
                     'categories' => $categories,
                     'forExperiencedProfessionals' => $this->offerForExperiencedProfessionals($offerItem->categories),
-                'requiredYearsOfExperience' => $this->getYearsOfExperience($scrappedJobOffer['description'], $categories)
+                    'requiredYearsOfExperience' => $this->getYearsOfExperience($scrappedJobOffer['description'], $categories)
                 ], $scrappedJobOffer ?? []);
 
                 return $analysedItems;
@@ -63,6 +64,8 @@ class SpotifyCommand extends Command
 
         }
 
+
+        $this->prepareReport($analysedItems);
         $io->success('OK');
         return 0;
     }
@@ -129,6 +132,8 @@ You’re comfortable working with partners to create holistic solutions involvin
         $matches = [];
         preg_match('/[A-Z][a-z\s]*(\d).?(\d)?[\w\s,\\-]*experience[\w\s,\\-]*\./m', $desc, $matches);
 
+        print_r($desc);
+
         $requiredYears = 'n/a';
         if (!empty($matches[1])) {
             $requiredYears = $matches[1];
@@ -145,6 +150,28 @@ You’re comfortable working with partners to create holistic solutions involvin
         }
 
         return $requiredYears;
+    }
+
+
+    private function prepareReport(array $analysedItems)
+    {
+        $mapped = array_map(function ($item) {
+            return [
+                'url' => $item['url'],
+                'headline' => $item['headline'],
+                'description' => $item['description'],
+                'for_experienced_professionals' => $item['forExperiencedProfessionals'] ? 'true' : 'false',
+                'required_years_of_experience' => $item['requiredYearsOfExperience'],
+            ];
+        }, $analysedItems);
+
+        $fp = fopen('var/report.csv', 'w');
+
+        foreach ($mapped  as $item) {
+            fputcsv($fp, $item);
+        }
+
+        fclose($fp);
     }
 }
 //[A-Z][a-z\s]*(\d).?(\d)?[\w\s,\\-]*experience[\w\s,\\-]*\.
