@@ -16,3 +16,12 @@ services:
     App\:
         resource: '../src/App/*'
         exclude: '../src/App/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    JobOffersAnalyzer\:
+        resource: '../src/JobOffersAnalyzer'
+        exclude: '../src/{Domain, UseCase}'
+
+    App\Command\JobOffersAnalyzer\SpotifyCommand:
+        arguments:
+          - "%spotify_job_offers_url%"
+
