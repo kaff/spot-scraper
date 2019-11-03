@@ -1,0 +1,3 @@
+suites:
+  analyzer:
+    spec_path: "%paths.config%/tests"

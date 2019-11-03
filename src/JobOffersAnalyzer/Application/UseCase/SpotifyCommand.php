@@ -6,5 +6,8 @@ namespace JobOffersAnalyzer\Application\UseCase;
 
 class SpotifyCommand
 {
-
+    /**
+     * @var string
+     */
+    public $url;
 }

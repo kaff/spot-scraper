@@ -17,11 +17,38 @@ services:
         resource: '../src/App/*'
         exclude: '../src/App/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    JobOffersAnalyzer\:
-        resource: '../src/JobOffersAnalyzer'
-        exclude: '../src/{Domain, UseCase}'
-
     App\Command\JobOffersAnalyzer\SpotifyCommand:
         arguments:
           - "%spotify_job_offers_url%"
 
+    App\Repository\JobOffersRepository:
+        arguments:
+            - "@guzzle.client"
+            - "@App\\Service\\Scrapper\\SpotifyJobOffer"
+
+    App\Service\Scrapper\SpotifyJobOffer:
+        arguments:
+            - "@goutte.client"
+
+    App\Service\CsvReportGenerator:
+        arguments:
+            - "%report_dir%"
+
+    guzzle.client:
+        class: GuzzleHttp\Client
+
+    goutte.client:
+        class: Goutte\Client
+
+    JobOffersAnalyzer\:
+        resource: '../src/JobOffersAnalyzer/*'
+        exclude: '../src/{Domain/Model, UseCase/*Command}'
+
+    JobOffersAnalyzer\Domain\Service\SpotifyJobOfferAnalyzer:
+        arguments:
+            - "@App\\Repository\\JobOffersRepository"
+
+    JobOffersAnalyzer\Application\UseCase\Spotify:
+        arguments:
+            - "@JobOffersAnalyzer\\Domain\\Service\\SpotifyJobOfferAnalyzer"
+            - "@App\\Service\\CsvReportGenerator"

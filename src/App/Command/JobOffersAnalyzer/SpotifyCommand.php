@@ -3,12 +3,9 @@ declare(strict_types=1);
 
 namespace App\Command\JobOffersAnalyzer;
 
-use GuzzleHttp;
-use Goutte;
+use JobOffersAnalyzer\Application\UseCase;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -21,9 +18,15 @@ class SpotifyCommand extends Command
      */
     private $url;
 
-    public function __construct(string $url)
+    /**
+     * @var UseCase\Spotify
+     */
+    private $useCaseSpotify;
+
+    public function __construct(string $url, UseCase\ISpotify $useCaseSpotify)
     {
         $this->url = $url;
+        $this->useCaseSpotify = $useCaseSpotify;
 
         parent::__construct();
     }
@@ -37,148 +40,11 @@ class SpotifyCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->text($this->url);
+        $command = new UseCase\SpotifyCommand();
+        $command->url = $this->url;
+        $this->useCaseSpotify->execute($command);
 
-        $offersPackage = $this->getRawOffers();
-        $analysedItems = [];
-        foreach($offersPackage as $offers) {
-            $analysedItems = array_reduce($offers, function($analysedItems, $offerItem) {
-
-                $categories = array_map(function ($category) {
-                    return $category->slug;
-                }, $offerItem->categories);
-
-            $scrappedJobOffer = $this->getJobOffer($offerItem->url);
-
-                $analysedItems[] = array_merge([
-                    'url' => $offerItem->url,
-                    'headline' => $offerItem->title,
-                    'categories' => $categories,
-                    'forExperiencedProfessionals' => $this->offerForExperiencedProfessionals($offerItem->categories),
-                    'requiredYearsOfExperience' => $this->getYearsOfExperience($scrappedJobOffer['description'], $categories)
-                ], $scrappedJobOffer ?? []);
-
-                return $analysedItems;
-
-            }, $analysedItems);
-
-        }
-
-
-        $this->prepareReport($analysedItems);
-        $io->success('OK');
+        $io->success('Report was generated. Check var/report.csv');
         return 0;
     }
-
-    private function getRawOffers()
-    {
-        $client = new GuzzleHttp\Client();
-        $pageNumber = 1;
-        do {
-            $response = $client->request('POST', $this->url, [
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
-                ],
-                'body' => http_build_query([
-                    'action' => 'get_jobs',
-                    'pageNr' => $pageNumber,
-                    'perPage' => 30,
-                    'featuredJobs' => '',
-                    'category' => 0,
-                    'location' => 0,
-                    'search' => '',
-                    'locations' => [
-                        'sweden'
-                    ]
-                ])
-            ]);
-
-            $items = json_decode((string)$response->getBody())->data->items;
-            $pageNumber++;
-
-            yield $items;
-        } while (count($items) > 0);
-    }
-
-    private function getJobOffer($url)
-    {
-        $client = new Goutte\Client();
-        $crawler = $client->request('GET', $url);
-        $desc = trim($crawler->filter('div.entry-content')->text());
-
-        return [
-            'description' => $desc
-        ];
-    }
-
-    private function offerForExperiencedProfessionals(array $categories)
-    {
-        $filteredCategories = array_map(function ($category) {
-            return mb_strtolower($category->name);
-        }, $categories);
-        return array_search('students', $filteredCategories) === false;
-    }
-
-    private function getYearsOfExperience(string $desc, $categories)
-    {
-
-        $test = "You are willing to get hands-on, partnering closely with other functions and/or engineering teams.
-Who you are
-You have 3 years practical management experience with designers in an agile product development environment, and you are able to foster and grow the culture in cross-functional teams through advocacy.
-You’re comfortable working with partners to create holistic solutions involving both internal and external technology and products.
-";
-
-
-        $matches = [];
-        preg_match('/[A-Z][a-z\s]*(\d).?(\d)?[\w\s,\\-]*experience[\w\s,\\-]*\./m', $desc, $matches);
-
-        print_r($desc);
-
-        $requiredYears = 'n/a';
-        if (!empty($matches[1])) {
-            $requiredYears = $matches[1];
-        }
-
-        if (!empty($matches[2])) {
-            $requiredYears .= '-'.$matches[2];
-        }
-
-        if (empty($requiredYears)) {
-            if($this->offerForExperiencedProfessionals($categories)) {
-                return '6';
-            }
-        }
-
-        return $requiredYears;
-    }
-
-
-    private function prepareReport(array $analysedItems)
-    {
-        $mapped = array_map(function ($item) {
-            return [
-                'url' => $item['url'],
-                'headline' => $item['headline'],
-                'description' => $item['description'],
-                'for_experienced_professionals' => $item['forExperiencedProfessionals'] ? 'true' : 'false',
-                'required_years_of_experience' => $item['requiredYearsOfExperience'],
-            ];
-        }, $analysedItems);
-
-        $fp = fopen('var/report.csv', 'w');
-
-        foreach ($mapped  as $item) {
-            fputcsv($fp, $item);
-        }
-
-        fclose($fp);
-    }
 }
-//[A-Z][a-z\s]*(\d).?(\d)?[\w\s,\\-]*experience[\w\s,\\-]*\.
-//  (\d)?(\d)?years+
-
-//You are willing to get hands-on, partnering closely with other functions and/or engineering teams.
-//Who you are
-//You have 3 years practical management experience with designers in an agile product development environment, and you are able to foster and grow the culture in cross-functional teams through advocacy.
-//You’re comfortable working with partners to create holistic solutions involving both internal and external technology and products.
-//You have 7+ years of related experience. You have 7-8 years of related experience. You have 5 years of related experience.

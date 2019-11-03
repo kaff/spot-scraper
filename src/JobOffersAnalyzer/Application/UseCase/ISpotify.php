@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace JobOffersAnalyzer\Application\UseCase;
 
-use JobOffersAnalyzer\Domain\SpotifyReport;
+use JobOffersAnalyzer\Domain\Model\SpotifyReport;
 
 interface ISpotify
 {
-    public function execute(SpotifyCommand $command): SpotifyReport;
+    public function execute(SpotifyCommand $command);
 }

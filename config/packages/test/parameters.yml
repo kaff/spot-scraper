@@ -1,2 +1,3 @@
 parameters:
   spotify_job_offers_url: http://localhost:8000
+  report_dir: var/test/

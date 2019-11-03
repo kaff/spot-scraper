@@ -12,5 +12,5 @@ services:
             - ./:/var/www/app/
             - ${SSH_AUTH_SOCK}:/tmp/ssh-agent.sock
         working_dir: /var/www/app/
-        command:  php -S localhost:8000 features/simple-mock-server/index.php
+        command:  php -S localhost:8000 tests/features/simple-mock-server/index.php
         hostname: php-serv
