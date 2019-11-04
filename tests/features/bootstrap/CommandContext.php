@@ -11,6 +11,7 @@ use PHPUnit\Framework\Assert;
 class CommandContext implements Context
 {
     private const REPORT_PATH = 'var/test/';
+    private const COLUMN_HEADERS = 0;
 
     /**
      * @var KernelInterface
@@ -72,7 +73,7 @@ class CommandContext implements Context
     public function iHaveCvsReportInWithData($reportPath, TableNode $table)
     {
         $tableRows = $table->getRows();
-        unset($tableRows[0]); //remove header
+        unset($tableRows[self::COLUMN_HEADERS]); //remove header
         $expectedRows = array_values($tableRows);
 
         $i = 0;
