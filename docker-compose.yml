@@ -8,9 +8,13 @@ services:
             - docker-compose.env
         environment:
             SSH_AUTH_SOCK: /tmp/ssh-agent.sock
+            PHP_EXT_XDEBUG: 'True'
+            TERM: xterm-color            
         volumes:
             - ./:/var/www/app/
             - ${SSH_AUTH_SOCK}:/tmp/ssh-agent.sock
+        ports:
+            - 8000:8000
         working_dir: /var/www/app/
         command:  php -S localhost:8000 tests/features/simple-mock-server/index.php
         hostname: php-serv
