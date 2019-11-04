@@ -5,16 +5,16 @@ Dear Reviewer,
 
 The most important part of the application you can find in `/src` dir. I try to adopt Ports & Adapters/Onion Architecture here. I'm aware that Spotify Job Offers Analyzer is a very simple application and probably an app with such low complexity level do not need patterns like this. I assume that it could be a frame to build a more complex application and I would like to show a concept. `/src/JobOffersAnalyzer` should be treated as Business Logic layer - independent of a framework. `/src/App` should be treated as most outer layer where `/src/App/Command` is Primary Adapters layer and `/src/App/Repository` is Secondary Adapters layer.
 
-Tests:
+###Tests:
 There are e2e, integration and unit tests implemented. You can find it in tests directory.
-`tests/features` - e2e test written in behat
-`tests/integration` - integration test (only one was required ;) ) written in PHPUnit
-`tests/spec` - unit tests written in PHPSpec
+* `tests/features` - e2e test written in behat
+* `tests/integration` - integration test (only one was required ;) ) written in PHPUnit
+* `tests/spec` - unit tests written in PHPSpec
 
 For e2e test needs, I implemented a simple mock server. It is in `tests/feature/simple-mock-server` - is required for e2e tests correct work. When you use docker it runs automatically otherwise, you have to run it manually before launching e2e tests. Details, how to run it you can find in the instruction below.
 
 To get and analyze all the job offers I decided not to scrap https://www.spotifyjobs.com/search-jobs/#location=sweden website directly.  
-Instead of that, command grab job offers from https://www.spotifyjobs.com/wp-admin/admin-ajax.php which is used by spotifyjobs.com to load offers after clicking 'MORE JOBS' button. After that crawler gets a description for each offer one by one by loading a particular job offer website.   
+Instead of that, command grab complete job offers list from https://www.spotifyjobs.com/wp-admin/admin-ajax.php which is used by spotifyjobs.com to load offers after clicking 'MORE JOBS' button. After that, crawler gets a description for each offer one by one by scrapping a particular job offer website.   
 
 I appreciate any feedback.
 
