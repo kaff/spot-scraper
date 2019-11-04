@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class CsvReportGeneratorTest extends TestCase
 {
-
     private const REPORT_PATH = 'var/test/';
 
     /**
@@ -22,7 +21,8 @@ class CsvReportGeneratorTest extends TestCase
     {
         $this->generator = new CsvReportGenerator(self::REPORT_PATH);
 
-        @unlink(self::REPORT_PATH.'report.csv');
+        $this->prepareReportDir();
+        $this->removeOldReport();
     }
 
     public function test_it_should_generate_csv_report()
@@ -32,6 +32,18 @@ class CsvReportGeneratorTest extends TestCase
         $this->generator->process($jobOffers);
 
         $this->assertReportContentEquals($this->getExpectedReport());
+    }
+
+    private function prepareReportDir()
+    {
+        if (!file_exists(self::REPORT_PATH)) {
+            mkdir(self::REPORT_PATH, 0777);
+        }
+    }
+
+    private function removeOldReport()
+    {
+        @unlink(self::REPORT_PATH.'report.csv');
     }
 
     private function prepareData()

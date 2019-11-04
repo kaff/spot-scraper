@@ -10,6 +10,8 @@ use PHPUnit\Framework\Assert;
 
 class CommandContext implements Context
 {
+    private const REPORT_PATH = 'var/test/';
+
     /**
      * @var KernelInterface
      */
@@ -36,6 +38,16 @@ class CommandContext implements Context
         $this->application = new Application($kernel);
         $this->output = new BufferedOutput();
         $this->basePath = $basePath;
+    }
+
+    /**
+     * @BeforeScenario
+     */
+    public static function createReportDir()
+    {
+        if (!file_exists(self::REPORT_PATH)) {
+            mkdir(self::REPORT_PATH, 0777);
+        }
     }
 
     /**
