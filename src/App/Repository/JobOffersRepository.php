@@ -17,7 +17,7 @@ class JobOffersRepository implements Infrastructure\JobOffersRepository
     private $httpClient;
 
     /**
-     * @var Scrapper;
+     * @var Scrapper\JobOffer;
      */
     private $scrapper;
 
@@ -28,7 +28,7 @@ class JobOffersRepository implements Infrastructure\JobOffersRepository
     }
 
     /**
-     * @return \Iterator<SimpleJobOffer>
+     * @return \Iterator<Infrastructure\DTO\JobOffer[]>
      */
     public function getOffersList(string $url): \Iterator
     {

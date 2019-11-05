@@ -73,7 +73,7 @@ class CommandContext implements Context
     public function iHaveCvsReportInWithData($reportPath, TableNode $table)
     {
         $tableRows = $table->getRows();
-        unset($tableRows[self::COLUMN_HEADERS]); //remove header
+        unset($tableRows[self::COLUMN_HEADERS]);
         $expectedRows = array_values($tableRows);
 
         $i = 0;

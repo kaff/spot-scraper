@@ -81,7 +81,6 @@ __URL_2__,__HEADLINE_2__,__DESCRIPTION_2__,false,2
 EOT;
     }
 
-
     private function assertReportContentEquals($expectedContent)
     {
         $content = @file_get_contents(self::REPORT_PATH.'report.csv');

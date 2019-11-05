@@ -9,9 +9,8 @@ use JobOffersAnalyzer\Infrastructure\AnalysisResultProcessor;
 
 class CsvReportGenerator implements AnalysisResultProcessor
 {
-
     /**
-     * @var
+     * @var string
      */
     private $reportDir;
 
